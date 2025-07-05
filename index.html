@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="favicon.ico">
+    <meta name="theme-color" content="#3a86ff">
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerencia Motorista - Planejamento Financeiro</title>
+    <style>
+        :root {
+            --primary: #3a86ff;
+            --secondary: #8338ec;
+            --dark: #212529;
+            --light: #f8f9fa;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+            --info: #17a2b8;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--light);
+            color: var(--dark);
+            line-height: 1.6;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            padding: 30px;
+        }
+        
+        h1 {
+            color: var(--primary);
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        h2 {
+            color: var(--secondary);
+            margin: 20px 0 15px;
+            font-size: 1.3rem;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(58, 134, 255, 0.2);
+        }
+        
+        button {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: background-color 0.3s;
+            width: 100%;
+            margin-top: 10px;
+        }
+        
+        button:hover {
+            background-color: #2a75e6;
+        }
+        
+        .result-container {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            display: none;
+        }
+        
+        .license-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .close-modal {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 24px;
+            cursor: pointer;
+        }
+        
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .result-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        
+        .result-label {
+            font-weight: 600;
+        }
+        
+        .result-value {
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        .highlight {
+            background-color: var(--primary);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            text-align: center;
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+        
+        .expense-item {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .expense-item input {
+            flex: 1;
+        }
+        
+        .remove-expense {
+            background-color: var(--danger);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            width: 40px;
+            cursor: pointer;
+        }
+        
+        .add-expense {
+            background-color: var(--success);
+            margin-top: 5px;
+        }
+        
+        .fuel-summary {
+            background-color: var(--info);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+        
+        .net-profit {
+            background-color: var(--success);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+        
+        .summary-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+        
+        .summary-value {
+            font-size: 1.2rem;
+            text-align: center;
+            margin: 5px 0;
+        }
+        
+        .feedback-section {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .feedback-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            justify-content: center;
+        }
+        
+        .feedback-buttons button {
+            width: auto;
+            padding: 10px 20px;
+        }
+        
+        .like-btn {
+            background-color: var(--success);
+        }
+        
+        .dislike-btn {
+            background-color: var(--danger);
+        }
+        
+        .donation-btn {
+            background-color: #6f42c1;
+            margin-top: 15px;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .thank-you-message {
+            color: var(--success);
+            font-weight: 600;
+            margin-top: 15px;
+        }
+        
+        .license-message {
+            background-color: var(--warning);
+            color: var(--dark);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .license-input-section {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f0f0f0;
+            border-radius: 8px;
+        }
+        
+        .invalid-field {
+            border-color: var(--danger) !important;
+            box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.2) !important;
+        }
+        
+        .whatsapp-btn {
+            background-color: #25D366;
+            color: white;
+            text-decoration: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            font-weight: 600;
+            display: inline-block;
+            transition: background-color 0.3s;
+            margin-top: 15px;
+        }
+        
+        .whatsapp-btn:hover {
+            background-color: #128C7E;
+        }
+        
+        .license-instructions {
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .license-instructions ol {
+            padding-left: 20px;
+            margin: 15px 0;
+        }
+        
+        .license-instructions li {
+            margin-bottom: 8px;
+        }
+        
+        .whatsapp-icon {
+            width: 20px;
+            vertical-align: middle;
+            margin-right: 8px;
+        }
+        
+        /* Estilos para o modal de telefone/senha */
+        .phone-modal {
+            display: flex;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .phone-modal-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+        }
+        
+        .phone-modal h2 {
+            color: var(--primary);
+            margin-bottom: 20px;
+        }
+        
+        .password-field {
+            display: none;
+            margin-top: 15px;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 1.5rem;
+            }
+            
+            .feedback-buttons {
+                flex-direction: column;
+            }
+            
+            .feedback-buttons button {
+                width: 100%;
+            }
+            
+            .modal-content {
+                padding: 20px;
+                width: 95%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Modal de verificação de telefone/senha -->
+    <div id="phone-modal" class="phone-modal">
+        <div class="phone-modal-content">
+            <h2 id="phone-modal-title">Verificação de Acesso</h2>
+            <p id="phone-modal-message">Por favor, informe seu número de WhatsApp:</p>
+            
+            <div class="form-group">
+                <input type="tel" id="user-phone" placeholder="(DDD) 9XXXX-XXXX" required>
+            </div>
+            
+            <div id="password-field" class="form-group password-field">
+                <label for="user-password">Senha de Acesso:</label>
+                <input type="password" id="user-password" placeholder="Digite a senha">
+            </div>
+            
+            <button type="button" id="verify-phone-btn">Continuar</button>
+            
+            <div id="phone-verification-message" class="thank-you-message hidden" style="margin-top: 15px;"></div>
+        </div>
+    </div>
+
+    <div class="container" id="main-app" style="display: none;">
+        <h1>Gerencia Motorista</h1>
+        <p>Calcule quantos quilômetros você precisa rodar para atingir sua meta diária</p>
+        
+        <div id="license-message" class="license-message">
+            <p>Você tem <span id="calculos-restantes">1</span> cálculo gratuito. <a href="#" id="whatsapp-link">Clique aqui</a> para adquirir a licença via WhatsApp e ter acesso ilimitado!</p>
+        </div>
+        
+        <div id="license-input-section" class="license-input-section hidden">
+            <h3>Já possui uma licença?</h3>
+            <div class="form-group">
+                <label for="input-license-code">Código de Ativação</label>
+                <input type="text" id="input-license-code" placeholder="Digite seu código de ativação">
+            </div>
+            <button type="button" id="activate-license-btn">Ativar Licença</button>
+            <div id="license-activation-message" class="thank-you-message hidden"></div>
+        </div>
+        
+        <div class="form-group">
+            <label for="fuel-type">Tipo de Combustível</label>
+            <select id="fuel-type" required>
+                <option value="gasolina">Gasolina</option>
+                <option value="etanol">Etanol</option>
+                <option value="diesel">Diesel</option>
+                <option value="flex">Flex (Gasolina/Etanol)</option>
+                <option value="eletrico">Elétrico</option>
+                <option value="hibrido">Híbrido</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="fuel-consumption">Consumo Médio (km/l ou km/kWh)</label>
+            <input type="number" id="fuel-consumption" placeholder="Ex: 10" step="0.1" min="0.1" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="fuel-price">Preço do Combustível (R$/litro ou R$/kWh)</label>
+            <input type="number" id="fuel-price" placeholder="Ex: 5.50" step="0.01" min="0.01" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="earnings-per-km">Ganho por Km Rodado (R$/km)</label>
+            <input type="number" id="earnings-per-km" placeholder="Ex: 2.50" step="0.01" min="0.01" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="daily-goal">Meta Diária Bruta (R$)</label>
+            <input type="number" id="daily-goal" placeholder="Ex: 200" step="1" min="1" required>
+        </div>
+        
+        <h2>Despesas Diárias</h2>
+        <div id="expenses-container">
+            <div class="expense-item">
+                <input type="text" class="expense-name" placeholder="Nome da despesa (Ex: Almoço)">
+                <input type="number" class="expense-value" placeholder="Valor (R$)" step="0.01" min="0">
+                <button type="button" class="remove-expense">×</button>
+            </div>
+        </div>
+        
+        <button type="button" id="add-expense" class="add-expense">+ Adicionar Despesa</button>
+        
+        <button type="button" id="calculate-btn">Calcular</button>
+        
+        <button type="button" id="buy-license-btn" class="donation-btn">Comprar Licença Ilimitada</button>
+        
+        <div id="result-container" class="result-container">
+            <h2>Resultado</h2>
+            
+            <div class="result-item">
+                <span class="result-label">Meta diária bruta:</span>
+                <span class="result-value" id="result-goal">R$ 0,00</span>
+            </div>
+            
+            <div class="result-item">
+                <span class="result-label">Total de despesas:</span>
+                <span class="result-value" id="result-expenses">R$ 0,00</span>
+            </div>
+            
+            <div class="result-item">
+                <span class="result-label">Quilômetros necessários:</span>
+                <span class="result-value" id="result-km">0 km</span>
+            </div>
+            
+            <div class="result-item">
+                <span class="result-label">Custo com combustível:</span>
+                <span class="result-value" id="result-fuel-cost">R$ 0,00</span>
+            </div>
+            
+            <div class="fuel-summary">
+                <div class="summary-title">Resumo de Combustível</div>
+                <div class="summary-value" id="fuel-summary-value">0 litros/kWh</div>
+                <div class="summary-value" id="fuel-total-cost">R$ 0,00</div>
+            </div>
+            
+            <div class="net-profit">
+                <div class="summary-title">Lucro Líquido Estimado</div>
+                <div class="summary-value" id="net-profit-value">R$ 0,00</div>
+            </div>
+        </div>
+        
+        <div class="feedback-section" id="feedback-section">
+            <p>Você está gostando do Gerencia Motorista?</p>
+            <div class="feedback-buttons">
+                <button type="button" id="like-btn" class="like-btn">👍 Gostei</button>
+                <button type="button" id="dislike-btn" class="dislike-btn">👎 Não gostei</button>
+            </div>
+            <div id="thank-you-message" class="thank-you-message hidden">Obrigado pelo seu feedback!</div>
+        </div>
+    </div>
+
+    <!-- Modal de Licença -->
+    <div id="license-modal" class="license-modal">
+        <div class="modal-content">
+            <span class="close-modal" id="close-license-modal">&times;</span>
+            <h2>Adquirir Licença</h2>
+            
+            <div class="license-instructions">
+                <p>Para adquirir sua licença ilimitada:</p>
+                <ol>
+                    <li>Clique no botão abaixo para ser direcionado ao nosso WhatsApp oficial</li>
+                    <li>Envie sua solicitação com os dados necessários</li>
+                    <li>Você receberá o código de ativação por WhatsApp</li>
+                    <li>Insira o código na seção de ativação no topo da página</li>
+                </ol>
+                
+                <div style="text-align: center;">
+                    <a href="https://wa.me/message/ULKQRJHASCYNN1" target="_blank" class="whatsapp-btn">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp" class="whatsapp-icon">
+                        Falar no WhatsApp
+                    </a>
+                </div>
+                
+                <div style="margin-top: 20px; text-align: center;">
+                    <p>Após receber seu código, ative sua licença na seção superior da página.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Senha padrão
+            const DEFAULT_PASSWORD = "1234";
+            
+            // Números já cadastrados (serão armazenados localmente)
+            let registeredNumbers = JSON.parse(localStorage.getItem('registeredNumbers')) || [];
+
+            // Elementos do modal
+            const phoneModal = document.getElementById('phone-modal');
+            const phoneModalTitle = document.getElementById('phone-modal-title');
+            const phoneModalMessage = document.getElementById('phone-modal-message');
+            const verifyPhoneBtn = document.getElementById('verify-phone-btn');
+            const userPhoneInput = document.getElementById('user-phone');
+            const passwordField = document.getElementById('password-field');
+            const userPasswordInput = document.getElementById('user-password');
+            const phoneVerificationMessage = document.getElementById('phone-verification-message');
+            const mainApp = document.getElementById('main-app');
+
+            // Verificar se já tem número cadastrado
+            const storedPhone = localStorage.getItem('userPhone');
+            const isFirstTime = storedPhone === null;
+
+            if (!isFirstTime) {
+                // Já usou antes - preenche automaticamente o número
+                userPhoneInput.value = storedPhone;
+            }
+
+            // Configurar o botão de verificação
+            verifyPhoneBtn.addEventListener('click', function() {
+                const phoneNumber = userPhoneInput.value.trim();
+                const cleanPhone = phoneNumber.replace(/\D/g, '');
+                const password = userPasswordInput.value.trim();
+
+                if (!phoneNumber) {
+                    showMessage('Por favor, informe seu número de WhatsApp.', 'error');
+                    return;
+                }
+
+                if (isFirstTime) {
+                    // Primeira vez - cadastra o número e libera acesso
+                    registerNumber(cleanPhone);
+                    grantAccess();
+                } else {
+                    // Verifica se o número está cadastrado
+                    if (registeredNumbers.includes(cleanPhone)) {
+                        grantAccess();
+                    } else {
+                        // Número não cadastrado - pede senha
+                        if (passwordField.style.display === 'none') {
+                            // Mostra campo de senha
+                            phoneModalTitle.textContent = 'Acesso Restrito';
+                            phoneModalMessage.textContent = 'Número não cadastrado. Digite a senha de acesso:';
+                            passwordField.style.display = 'block';
+                            verifyPhoneBtn.textContent = 'Verificar Senha';
+                            return;
+                        }
+                        
+                        // Verifica a senha
+                        if (password === DEFAULT_PASSWORD) {
+                            registerNumber(cleanPhone);
+                            grantAccess();
+                        } else {
+                            showMessage('Senha incorreta. Por favor, tente novamente.', 'error');
+                            userPasswordInput.value = '';
+                        }
+                    }
+                }
+            });
+
+            function registerNumber(phone) {
+                // Adiciona o número à lista de cadastrados
+                if (!registeredNumbers.includes(phone)) {
+                    registeredNumbers.push(phone);
+                    localStorage.setItem('registeredNumbers', JSON.stringify(registeredNumbers));
+                }
+                
+                // Salva o número do usuário
+                localStorage.setItem('userPhone', phone);
+            }
+
+            function grantAccess() {
+                // Libera acesso ao aplicativo
+                phoneModal.style.display = 'none';
+                mainApp.style.display = 'block';
+                initializeApp();
+            }
+
+            function showMessage(message, type) {
+                phoneVerificationMessage.textContent = message;
+                phoneVerificationMessage.style.color = type === 'error' ? 'var(--danger)' : 'var(--success)';
+                phoneVerificationMessage.classList.remove('hidden');
+            }
+
+            function initializeApp() {
+                // Verificar se já tem licença ativa no localStorage
+                let licenseActive = localStorage.getItem('licenseActive') === 'true';
+                let calculationsLeft = licenseActive ? Infinity : (parseInt(localStorage.getItem('calculationsLeft')) || 1);
+                
+                // Elementos do DOM
+                const calculateBtn = document.getElementById('calculate-btn');
+                const buyLicenseBtn = document.getElementById('buy-license-btn');
+                const licenseModal = document.getElementById('license-modal');
+                const closeLicenseModal = document.getElementById('close-license-modal');
+                const calculationsLeftSpan = document.getElementById('calculos-restantes');
+                const licenseInputSection = document.getElementById('license-input-section');
+                const activateLicenseBtn = document.getElementById('activate-license-btn');
+                const licenseCodeInput = document.getElementById('input-license-code');
+                const licenseActivationMessage = document.getElementById('license-activation-message');
+                const likeBtn = document.getElementById('like-btn');
+                const dislikeBtn = document.getElementById('dislike-btn');
+                const thankYouMessage = document.getElementById('thank-you-message');
+                const resultContainer = document.getElementById('result-container');
+                const whatsappLink = document.getElementById('whatsapp-link');
+                
+                // Mostrar seção de ativação de licença
+                if (!licenseActive) {
+                    licenseInputSection.classList.remove('hidden');
+                }
+                
+                // Atualizar contador de cálculos
+                calculationsLeftSpan.textContent = calculationsLeft;
+                
+                if (licenseActive) {
+                    updateUIForActiveLicense();
+                }
+                
+                // Adicionar nova despesa
+                document.getElementById('add-expense').addEventListener('click', function() {
+                    const expenseItem = document.createElement('div');
+                    expenseItem.className = 'expense-item';
+                    expenseItem.innerHTML = `
+                        <input type="text" class="expense-name" placeholder="Nome da despesa (Ex: Almoço)">
+                        <input type="number" class="expense-value" placeholder="Valor (R$)" step="0.01" min="0">
+                        <button type="button" class="remove-expense">×</button>
+                    `;
+                    document.getElementById('expenses-container').appendChild(expenseItem);
+                    
+                    // Adicionar evento para remover despesa
+                    expenseItem.querySelector('.remove-expense').addEventListener('click', function() {
+                        expenseItem.remove();
+                    });
+                });
+                
+                // Remover despesa para o item inicial
+                document.querySelector('.remove-expense').addEventListener('click', function() {
+                    const expenseItems = document.querySelectorAll('.expense-item');
+                    if (expenseItems.length > 1) {
+                        this.closest('.expense-item').remove();
+                    }
+                });
+                
+                // Validar formulário
+                function validateForm() {
+                    let isValid = true;
+                    const requiredFields = [
+                        'fuel-type', 'fuel-consumption', 'fuel-price', 
+                        'earnings-per-km', 'daily-goal'
+                    ];
+                    
+                    // Resetar estilos de erro
+                    document.querySelectorAll('.invalid-field').forEach(el => {
+                        el.classList.remove('invalid-field');
+                    });
+                    
+                    for (const fieldId of requiredFields) {
+                        const field = document.getElementById(fieldId);
+                        if (!field.value.trim()) {
+                            field.classList.add('invalid-field');
+                            field.focus();
+                            alert(`Por favor, preencha o campo: ${field.labels[0].textContent}`);
+                            isValid = false;
+                            break;
+                        }
+                        
+                        // Validação adicional para valores numéricos
+                        if (field.type === 'number') {
+                            const value = parseFloat(field.value);
+                            const min = parseFloat(field.min) || 0;
+                            
+                            if (isNaN(value) || value < min) {
+                                field.classList.add('invalid-field');
+                                field.focus();
+                                alert(`Por favor, insira um valor válido para: ${field.labels[0].textContent}`);
+                                isValid = false;
+                                break;
+                            }
+                        }
+                    }
+                    
+                    return isValid;
+                }
+                
+                // Calcular resultados
+                calculateBtn.addEventListener('click', function() {
+                    if (!validateForm()) {
+                        return;
+                    }
+                    
+                    if (!licenseActive && calculationsLeft <= 0) {
+                        alert('Você usou todos os cálculos gratuitos. Por favor, adquira a licença ou insira seu código de ativação para continuar usando o aplicativo.');
+                        licenseInputSection.scrollIntoView({ behavior: 'smooth' });
+                        return;
+                    }
+                    
+                    try {
+                        // Obter valores do formulário com sanitização
+                        const fuelConsumption = Math.max(0.1, parseFloat(document.getElementById('fuel-consumption').value) || 0);
+                        const fuelPrice = Math.max(0.01, parseFloat(document.getElementById('fuel-price').value) || 0);
+                        const earningsPerKm = Math.max(0.01, parseFloat(document.getElementById('earnings-per-km').value) || 0);
+                        const dailyGoal = Math.max(1, parseFloat(document.getElementById('daily-goal').value) || 0);
+                        
+                        // Calcular despesas
+                        let totalExpenses = 0;
+                        document.querySelectorAll('.expense-item').forEach(item => {
+                            const value = Math.max(0, parseFloat(item.querySelector('.expense-value').value) || 0);
+                            totalExpenses += value;
+                        });
+                        
+                        // Calcular quilômetros necessários para atingir a meta bruta
+                        const kmNeeded = earningsPerKm > 0 ? dailyGoal / earningsPerKm : 0;
+                        
+                        // Calcular custo com combustível
+                        const fuelNeeded = fuelConsumption > 0 ? kmNeeded / fuelConsumption : 0;
+                        const fuelCost = fuelNeeded * fuelPrice;
+                        
+                        // Calcular lucro líquido (meta bruta - despesas - combustível)
+                        const netProfit = dailyGoal - totalExpenses - fuelCost;
+                        
+                        // Exibir resultados
+                        document.getElementById('result-goal').textContent = `R$ ${dailyGoal.toFixed(2)}`;
+                        document.getElementById('result-expenses').textContent = `R$ ${totalExpenses.toFixed(2)}`;
+                        document.getElementById('result-km').textContent = `${kmNeeded.toFixed(1)} km`;
+                        document.getElementById('result-fuel-cost').textContent = `R$ ${fuelCost.toFixed(2)}`;
+                        document.getElementById('fuel-summary-value').textContent = `${fuelNeeded.toFixed(2)} ${document.getElementById('fuel-type').value === 'eletrico' ? 'kWh' : 'litros'}`;
+                        document.getElementById('fuel-total-cost').textContent = `R$ ${fuelCost.toFixed(2)}`;
+                        document.getElementById('net-profit-value').textContent = `R$ ${netProfit.toFixed(2)}`;
+                        
+                        // Mostrar resultados
+                        resultContainer.style.display = 'block';
+                        
+                        // Decrementar cálculos restantes se não tiver licença
+                        if (!licenseActive) {
+                            calculationsLeft--;
+                            calculationsLeftSpan.textContent = calculationsLeft;
+                            localStorage.setItem('calculationsLeft', calculationsLeft);
+                            
+                            if (calculationsLeft <= 0) {
+                                document.getElementById('license-message').innerHTML = 
+                                    '<p>Você usou todos os cálculos gratuitos. Adquira a licença ou insira seu código para continuar.</p>';
+                            }
+                        }
+                    } catch (error) {
+                        console.error('Erro ao calcular:', error);
+                        alert('Ocorreu um erro ao processar os cálculos. Por favor, verifique os valores inseridos.');
+                    }
+                });
+                
+                // Ativar licença via código (em produção, substituir por verificação segura)
+                activateLicenseBtn.addEventListener('click', function() {
+                    const enteredCode = licenseCodeInput.value.trim();
+                    
+                    // Verificação básica (em produção, usar um sistema mais seguro)
+                    if (enteredCode && enteredCode.length >= 8) {
+                        // Ativar licença
+                        localStorage.setItem('licenseActive', 'true');
+                        licenseActive = true;
+                        calculationsLeft = Infinity;
+                        
+                        // Mostrar mensagem de sucesso
+                        licenseActivationMessage.textContent = 'Licença ativada com sucesso! Aplicativo liberado.';
+                        licenseActivationMessage.style.color = 'var(--success)';
+                        licenseActivationMessage.classList.remove('hidden');
+                        
+                        // Atualizar interface
+                        updateUIForActiveLicense();
+                        
+                        // Esconder seção de ativação após 3 segundos
+                        setTimeout(() => {
+                            licenseInputSection.classList.add('hidden');
+                        }, 3000);
+                    } else {
+                        licenseActivationMessage.textContent = 'Código inválido. Por favor, insira um código válido.';
+                        licenseActivationMessage.style.color = 'var(--danger)';
+                        licenseActivationMessage.classList.remove('hidden');
+                    }
+                });
+                
+                // Feedback - Gostei
+                likeBtn.addEventListener('click', function() {
+                    thankYouMessage.textContent = 'Obrigado pelo feedback positivo!';
+                    thankYouMessage.style.color = 'var(--success)';
+                    thankYouMessage.classList.remove('hidden');
+                    setTimeout(() => thankYouMessage.classList.add('hidden'), 3000);
+                });
+                
+                // Feedback - Não Gostei
+                dislikeBtn.addEventListener('click', function() {
+                    thankYouMessage.textContent = 'Obrigado pelo feedback. Vamos melhorar!';
+                    thankYouMessage.style.color = 'var(--danger)';
+                    thankYouMessage.classList.remove('hidden');
+                    setTimeout(() => thankYouMessage.classList.add('hidden'), 3000);
+                });
+                
+                // Modal de licença
+                buyLicenseBtn.addEventListener('click', function() {
+                    licenseModal.style.display = 'flex';
+                });
+                
+                whatsappLink.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    licenseModal.style.display = 'flex';
+                });
+                
+                closeLicenseModal.addEventListener('click', function() {
+                    licenseModal.style.display = 'none';
+                });
+                
+                // Fechar modal ao clicar fora
+                window.addEventListener('click', function(e) {
+                    if (e.target === licenseModal) {
+                        licenseModal.style.display = 'none';
+                    }
+                });
+                
+                function updateUIForActiveLicense() {
+                    document.getElementById('license-message').innerHTML = '<p>Licença ativada - Uso ilimitado liberado!</p>';
+                    document.getElementById('license-message').style.backgroundColor = 'var(--success)';
+                    document.getElementById('license-message').style.color = 'white';
+                    buyLicenseBtn.style.display = 'none';
+                }
+            }
+        });
+    </script>
+
+    <script>
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('service-worker.js')
+          .then(() => console.log("Service Worker registrado com sucesso"))
+          .catch((error) => console.error("Erro ao registrar Service Worker:", error));
+      }
+    </script>
+</body>
+</html>

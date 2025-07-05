@@ -1,0 +1,55 @@
+{
+  "id": "/gerencia-motorista",
+  "name": "Gerencia Motorista",
+  "short_name": "Gerencia",
+  "description": "App para motoristas profissionais calcularem metas di\u00e1rias e controlarem custos com precis\u00e3o.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#000000",
+  "background_color": "#000000",
+  "dir": "ltr",
+  "lang": "pt-BR",
+  "prefer_related_applications": false,
+  "launch_handler": {
+    "client_mode": "auto"
+  },
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "screenshot1.png",
+      "sizes": "540x960",
+      "type": "image/png",
+      "label": "Tela principal com calculadora de metas",
+      "platform": "narrow",
+      "orientation": "portrait"
+    },
+    {
+      "src": "screenshot2.png",
+      "sizes": "960x540",
+      "type": "image/png",
+      "label": "Resumo de lucros e despesas",
+      "platform": "wide",
+      "orientation": "landscape"
+    }
+  ],
+  "categories": [
+    "finance",
+    "productivity",
+    "tools"
+  ]
+}
